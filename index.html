@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarGo</title>    <meta name="theme-color" content="#34B2DF">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png"> 
+    <link rel="icon" type="image/x-icon" href="./icons/favicon.ico"> 
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Outfit:wght@700&display=swap" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f3f4f6;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+        }
+        /* Gradient background for hero sections or prominent elements */
+        .gradient-bg {
+            background-image: linear-gradient(to right, #34B2DF, #4F87DF);
+        }
+        /* Custom scrollbar for better aesthetics, if needed */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }        /* Hide booking modal, account, and auth modal for static version */
+        #booking-modal, #account, #auth-modal { display: none; }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-white shadow-md p-4 sticky top-0 z-50">
+        <nav class="container mx-auto flex justify-between items-center">
+            <a href="#hero" class="text-2xl font-bold text-gray-800">CarGo</a>
+            <div>
+                <a href="#home" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md">Home</a>
+                <a href="#featured-vehicles" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md">Vehicles</a>
+                <a href="#contact" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md">Contact</a>                <a href="#account" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md hidden">Account</a>
+                <button id="authButton" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300 ml-4 hidden">Login</button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow">
+        <section id="hero" class="gradient-bg text-white py-20 px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Your Journey Starts Here</h1>
+            <p class="text-xl md:text-2xl mb-8">Rent a car with ease and explore the world.</p>
+            <a href="#featured-vehicles" class="bg-white text-blue-600 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-gray-100 transition duration-300">Browse Vehicles</a>
+        </section>
+
+        <section id="featured-vehicles" class="py-16 px-4 bg-gray-50">
+            <div class="container mx-auto">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">Our Featured Vehicles</h2>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-700">Filter Vehicles</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label for="make-filter" class="block text-sm font-medium text-gray-700">Make</label>
+                            <select id="make-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">All Makes</option>
+                                <option value="Toyota">Toyota</option>
+                                <option value="Honda">Honda</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="car-type-filter" class="block text-sm font-medium text-gray-700">Car Type</label>
+                            <select id="car-type-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">All Types</option>
+                                <option value="Sedan">Sedan</option>
+                                <option value="SUV">SUV</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="gas-type-filter" class="block text-sm font-medium text-gray-700">Gas Type</label>
+                            <select id="gas-type-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">All Gas Types</option>
+                                <option value="Petrol">Petrol</option>
+                                <option value="Diesel">Diesel</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="seating-capacity-filter" class="block text-sm font-medium text-gray-700">Seating Capacity</label>
+                            <select id="seating-capacity-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">Any Capacity</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="7">7</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="filter-pickup-date" class="block text-sm font-medium text-gray-700">Pickup Date</label>
+                            <input type="text" id="filter-pickup-date" name="filter_pickup_date" class="flatpickr mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Select pickup date">
+                        </div>
+                        <div>
+                            <label for="filter-return-date" class="block text-sm font-medium text-gray-700">Return Date</label>
+                            <input type="text" id="filter-return-date" name="filter_return_date" class="flatpickr mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Select return date">
+                        </div>
+                    </div>
+                    <div class="mt-6 text-right">
+                        <button id="apply-filter-button" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition duration-300">Apply Filter</button>
+                    </div>
+                </div>
+
+                <div id="vehicle-listings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Static vehicle cards -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:scale-105">
+                        <img src="https://images.unsplash.com/photo-1503736334956-4c8f8e92946d" alt="Toyota Vios" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Toyota Vios</h3>
+                            <p class="text-gray-600 text-sm mb-2">Sedan - Petrol</p>
+                            <p class="text-gray-700 mb-4">Seats: 5</p>                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-bold text-blue-600">₱1500/day</span>
+                                <button class="book-now-button bg-gray-400 text-white px-5 py-2 rounded-md cursor-not-allowed" disabled>Book Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden transform transition duration-300 hover:scale-105">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Honda_CR-V_e-HEV_Elegance_AWD_%28VI%29_%E2%80%93_f_14072024.jpg" alt="Honda CRV" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Honda CRV</h3>
+                            <p class="text-gray-600 text-sm mb-2">SUV - Diesel</p>
+                            <p class="text-gray-700 mb-4">Seats: 7</p>                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-bold text-blue-600">₱2500/day</span>
+                                <button class="book-now-button bg-gray-400 text-white px-5 py-2 rounded-md cursor-not-allowed" disabled>Book Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Add more static vehicles as needed -->
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-16 px-4 bg-white">
+            <div class="container mx-auto">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">Get In Touch</h2>
+                <div class="max-w-md mx-auto bg-gray-50 p-8 rounded-lg shadow-md">
+                    <form id="contact-form" class="space-y-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                            <input type="text" id="name" name="name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="email" name="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
+                            <textarea id="message" name="message" rows="4" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">Send Message</button>
+                    </form>                    <div id="contact-response-message" class="mt-4 text-center text-sm font-medium hidden"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Booking Modal -->
+        <div id="booking-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 hidden">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold text-gray-800">Book Vehicle</h3>
+                    <button id="close-booking-modal" class="text-gray-500 hover:text-gray-700 text-3xl font-bold">&times;</button>
+                </div>
+                <form id="booking-form" class="space-y-4">
+                    <input type="hidden" id="booking-car-id">
+                    <img id="booking-car-image" src="" alt="Car Image" class="w-full h-48 object-cover rounded-md mb-4">
+                    <h4 id="booking-car-name" class="text-xl font-semibold text-gray-800 mb-2"></h4>
+                    <p id="booking-car-price" class="text-gray-600 text-lg mb-4"></p>
+
+                    <div>
+                        <label for="pickup-date" class="block text-sm font-medium text-gray-700">Pickup Date</label>
+                        <input type="text" id="pickup-date" name="pickup_date" required class="flatpickr mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="return-date" class="block text-sm font-medium text-gray-700">Return Date</label>
+                        <input type="text" id="return-date" name="return_date" required class="flatpickr mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="total-price" class="block text-sm font-medium text-gray-700">Total Price</label>
+                        <input type="text" id="total-price" name="total_price" readonly class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm text-gray-900 sm:text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">Confirm Booking</button>
+                </form>
+                <div id="booking-response-message" class="mt-4 text-center text-sm font-medium hidden"></div>
+            </div>
+        </div>
+
+        <!-- Auth Modal -->
+        <div id="auth-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 hidden">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 id="auth-modal-title" class="text-2xl font-bold text-gray-800">Login</h3>
+                    <button id="close-auth-modal" class="text-gray-500 hover:text-gray-700 text-3xl font-bold">&times;</button>
+                </div>
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="login-email" name="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="login-password" name="password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">Login</button>
+                    <p class="text-center text-sm mt-4">Don't have an account? <button type="button" id="show-register" class="text-blue-600 hover:underline">Register here</button></p>
+                </form>
+                <form id="register-form" class="space-y-4 hidden">
+                    <div>
+                        <label for="register-name" class="block text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" id="register-name" name="name" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="register-email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="register-email" name="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <div>
+                        <label for="register-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" id="register-password" name="password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">Register</button>
+                    <p class="text-center text-sm mt-4">Already have an account? <button type="button" id="show-login" class="text-blue-600 hover:underline">Login here</button></p>
+                </form>
+                <div id="auth-response-message" class="mt-4 text-center text-sm font-medium hidden"></div>
+            </div>
+        </div>
+
+        <!-- Account Section -->
+        <section id="account" class="py-16 px-4 bg-gray-50 hidden">
+            <div class="container mx-auto max-w-2xl">
+                <h2 class="text-3xl font-bold text-center text-gray-800 mb-10">My Account</h2>
+                
+                <div class="bg-white p-8 rounded-lg shadow-md">
+                    <div class="flex border-b border-gray-200 mb-6">
+                        <button id="tab-profile" class="px-4 py-2 text-lg font-medium text-blue-600 border-b-2 border-blue-600 focus:outline-none">Profile</button>
+                        <button id="tab-bookings" class="px-4 py-2 text-lg font-medium text-gray-600 hover:text-blue-600 focus:outline-none">Current Bookings</button>
+                        <button id="tab-history" class="px-4 py-2 text-lg font-medium text-gray-600 hover:text-blue-600 focus:outline-none">Booking History</button>
+                    </div>
+
+                    <div id="content-profile">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-700">My Profile</h3>
+                        <div id="profile-info" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Name</label>
+                                <p id="profile-name" class="mt-1 text-gray-900"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Email</label>
+                                <p id="profile-email" class="mt-1 text-gray-900"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="content-bookings" class="hidden">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-700">My Current Bookings</h3>
+                        <div id="current-bookings-list" class="space-y-4">
+                            <p class="text-gray-600" id="no-current-bookings-message">You have no active bookings.</p>
+                        </div>
+                    </div>
+
+                    <div id="content-history" class="hidden">
+                        <h3 class="text-xl font-semibold mb-4 text-gray-700">Booking History</h3>
+                        <div id="booking-history-list" class="space-y-4">
+                            <p class="text-gray-600" id="no-history-bookings-message">No past bookings found.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hide booking modal, account, and auth modal for static version -->
+        <style></style>
+    <footer class="bg-gray-800 text-white py-8 px-4 mt-auto">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 CarGo Application. All rights reserved.</p>
+            <div class="mt-4">
+                <a href="#" class="text-gray-400 hover:text-white mx-2">Privacy Policy</a>
+                <a href="#" class="text-gray-400 hover:text-white mx-2">Terms of Service</a>
+            </div>
+        </div>
+    </footer>    <script>
+        // Simple static functionality for the CarGo website
+        
+        // DOM Elements
+        const contactForm = document.getElementById('contact-form');
+        const contactResponseMessage = document.getElementById('contact-response-message');
+
+        // Helper Functions
+        function showResponseMessage(element, message, isSuccess) {
+            element.textContent = message;
+            element.classList.remove('hidden', 'text-green-600', 'text-red-600');
+            element.classList.add(isSuccess ? 'text-green-600' : 'text-red-600');
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Flatpickr for date inputs
+            flatpickr('.flatpickr', {
+                dateFormat: "Y-m-d",
+                minDate: "today"
+            });
+
+            // Navigation smooth scrolling
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href.startsWith('#')) {
+                        e.preventDefault();
+                        const targetId = href.substring(1);
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                });
+            });
+
+            // Filter functionality (visual only)
+            const applyFilterButton = document.getElementById('apply-filter-button');
+            if (applyFilterButton) {
+                applyFilterButton.addEventListener('click', () => {
+                    alert('Filter functionality is available in the full version with backend integration.');
+                });
+            }
+
+            // Contact Form
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                showResponseMessage(contactResponseMessage, 'Thank you for your message! We will get back to you soon.', true);
+                contactForm.reset();
+            });
+        });
+    </script>
+    </script>
+</body>
+</html>
