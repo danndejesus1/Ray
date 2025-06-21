@@ -1,0 +1,49 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Set the base directory
+RewriteBase /backend/api/
+
+# If the request is for an actual file or directory, skip rewriting
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Rewrite rules for API endpoints
+
+# Auth endpoints
+RewriteRule ^auth/login$ auth.php [L]
+RewriteRule ^auth/register$ auth.php [L]
+RewriteRule ^auth/verify-token$ auth.php [L]
+
+# Vehicle endpoints
+RewriteRule ^vehicles$ vehicles.php [L]
+RewriteRule ^vehicles/([0-9]+)$ vehicles.php?id=$1 [L]
+RewriteRule ^vehicles/filters$ vehicles.php?action=filters [L]
+RewriteRule ^vehicles/availability$ vehicles.php?action=availability [L]
+
+# Booking endpoints
+RewriteRule ^bookings$ bookings.php [L]
+RewriteRule ^bookings/([0-9]+)$ bookings.php?id=$1 [L]
+RewriteRule ^bookings/user/([0-9]+)$ bookings.php?action=user&id=$1 [L]
+RewriteRule ^bookings/status/([a-zA-Z]+)$ bookings.php?action=status&status=$1 [L]
+
+# Payment endpoints
+RewriteRule ^payments$ payments.php [L]
+RewriteRule ^payments/([0-9]+)$ payments.php?id=$1 [L]
+RewriteRule ^payments/booking/([0-9]+)$ payments.php?action=booking&id=$1 [L]
+RewriteRule ^payments/user/([0-9]+)$ payments.php?action=user&id=$1 [L]
+
+# User endpoints
+RewriteRule ^users$ users.php [L]
+RewriteRule ^users/([0-9]+)$ users.php?id=$1 [L]
+RewriteRule ^users/role/([a-zA-Z_]+)$ users.php?action=role&role=$1 [L]
+
+# Analytics endpoints
+RewriteRule ^analytics/dashboard$ analytics.php?action=dashboard [L]
+RewriteRule ^analytics/revenue$ analytics.php?action=revenue [L]
+RewriteRule ^analytics/bookings$ analytics.php?action=bookings [L]
+RewriteRule ^analytics/vehicles$ analytics.php?action=vehicles [L]
+
+# Handle 404 errors
+RewriteRule ^ - [R=404,L]

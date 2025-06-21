@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarGo Booking Staff Dashboard</title>
+    <meta name="theme-color" content="#34B2DF">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Outfit:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/main.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="navbar bg-white shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <a href="../../index.html" class="text-2xl font-bold text-gray-800">CarGo</a>
+                    <span class="text-gray-500">|</span>
+                    <span class="text-lg font-semibold text-blue-600">Booking Staff</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="staff-welcome" class="text-gray-600">Welcome, Staff</span>
+                    <button id="logout-btn" class="btn btn-secondary">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg min-h-screen">
+            <div class="p-6">
+                <nav class="space-y-2">
+                    <a href="#dashboard" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-medium">
+                        <span>📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#pending" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <span>⏳</span>
+                        <span>Pending Bookings</span>
+                    </a>
+                    <a href="#active" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <span>🚗</span>
+                        <span>Active Bookings</span>
+                    </a>
+                    <a href="#completed" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <span>✅</span>
+                        <span>Completed</span>
+                    </a>
+                    <a href="#calendar" class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50">
+                        <span>📅</span>
+                        <span>Calendar View</span>
+                    </a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-6">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="section">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6">Booking Management Dashboard</h1>
+                
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card">
+                        <div class="stat-value" id="pending-count">5</div>
+                        <div class="stat-label">Pending Bookings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="active-count">12</div>
+                        <div class="stat-label">Active Bookings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="completed-today">8</div>
+                        <div class="stat-label">Completed Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="revenue-today">₱32,500</div>
+                        <div class="stat-label">Today's Revenue</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card mb-8">
+                    <h2 class="text-xl font-semibold mb-4">Quick Actions</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <button onclick="bookingStaff.showSection('pending')" class="btn btn-warning text-center">
+                            ⏳ Review Pending
+                        </button>
+                        <button onclick="bookingStaff.showSection('active')" class="btn btn-primary text-center">
+                            🚗 Manage Active
+                        </button>
+                        <button onclick="bookingStaff.exportBookings()" class="btn btn-secondary text-center">
+                            📊 Export Report
+                        </button>
+                        <button onclick="bookingStaff.showSection('calendar')" class="btn btn-secondary text-center">
+                            📅 View Calendar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+                    <div id="recent-activity" class="space-y-4">
+                        <!-- Recent activity will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Bookings Section -->
+            <div id="pending-section" class="section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">Pending Bookings</h1>
+                    <div class="flex space-x-2">
+                        <select id="pending-filter" class="form-input">
+                            <option value="all">All Pending</option>
+                            <option value="today">Due Today</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                        <button onclick="bookingStaff.refreshPendingBookings()" class="btn btn-secondary">
+                            🔄 Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div id="pending-bookings-list" class="space-y-4">
+                    <!-- Pending bookings will be populated here -->
+                </div>
+            </div>
+
+            <!-- Active Bookings Section -->
+            <div id="active-section" class="section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">Active Bookings</h1>
+                    <div class="flex space-x-2">
+                        <input type="text" id="active-search" placeholder="Search by customer or vehicle" class="form-input">
+                        <select id="active-filter" class="form-input">
+                            <option value="all">All Active</option>
+                            <option value="pickup-today">Pickup Today</option>
+                            <option value="return-today">Return Today</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left py-3 px-4">Booking ID</th>
+                                    <th class="text-left py-3 px-4">Customer</th>
+                                    <th class="text-left py-3 px-4">Vehicle</th>
+                                    <th class="text-left py-3 px-4">Pickup Date</th>
+                                    <th class="text-left py-3 px-4">Return Date</th>
+                                    <th class="text-left py-3 px-4">Status</th>
+                                    <th class="text-left py-3 px-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="active-bookings-table">
+                                <!-- Active bookings will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Bookings Section -->
+            <div id="completed-section" class="section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">Completed Bookings</h1>
+                    <div class="flex space-x-2">
+                        <select id="completed-period" class="form-input">
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                        </select>
+                        <button onclick="bookingStaff.exportCompleted()" class="btn btn-secondary">
+                            📊 Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left py-3 px-4">Booking ID</th>
+                                    <th class="text-left py-3 px-4">Customer</th>
+                                    <th class="text-left py-3 px-4">Vehicle</th>
+                                    <th class="text-left py-3 px-4">Period</th>
+                                    <th class="text-left py-3 px-4">Total</th>
+                                    <th class="text-left py-3 px-4">Rating</th>
+                                    <th class="text-left py-3 px-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="completed-bookings-table">
+                                <!-- Completed bookings will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Section -->
+            <div id="calendar-section" class="section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">Booking Calendar</h1>
+                    <div class="flex space-x-2">
+                        <button onclick="bookingStaff.changeCalendarView('month')" class="btn btn-secondary">Month</button>
+                        <button onclick="bookingStaff.changeCalendarView('week')" class="btn btn-secondary">Week</button>
+                        <button onclick="bookingStaff.changeCalendarView('day')" class="btn btn-secondary">Day</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div id="calendar-view">
+                        <!-- Simple calendar implementation -->
+                        <div class="grid grid-cols-7 gap-1 mb-4">
+                            <div class="text-center font-semibold p-2">Sun</div>
+                            <div class="text-center font-semibold p-2">Mon</div>
+                            <div class="text-center font-semibold p-2">Tue</div>
+                            <div class="text-center font-semibold p-2">Wed</div>
+                            <div class="text-center font-semibold p-2">Thu</div>
+                            <div class="text-center font-semibold p-2">Fri</div>
+                            <div class="text-center font-semibold p-2">Sat</div>
+                        </div>
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-1">
+                            <!-- Calendar days will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Details Modal -->
+    <div id="booking-action-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold" id="modal-title">Booking Details</h2>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700 text-3xl">&times;</button>
+            </div>
+            <div id="modal-content">
+                <!-- Modal content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../config/app.config.js"></script>
+    <script src="../../components/auth/auth.js"></script>
+    
+    <script>
+        // Booking Staff Dashboard Implementation
+        class BookingStaffDashboard {
+            constructor() {
+                this.currentSection = 'dashboard';
+                this.pendingBookings = [];
+                this.activeBookings = [];
+                this.completedBookings = [];
+                this.init();
+            }
+
+            init() {
+                this.checkAuthentication();
+                this.bindEvents();
+                this.showSection('dashboard');
+                this.loadDashboardData();
+                this.loadBookingData();
+            }
+
+            checkAuthentication() {
+                if (!AuthManager.isAuthenticated() || !AuthManager.hasRole('booking_staff')) {
+                    window.location.href = '../../index.html';
+                    return;
+                }
+                
+                const user = AuthManager.getCurrentUser();
+                if (user) {
+                    document.getElementById('staff-welcome').textContent = `Welcome, ${user.name}`;
+                }
+            }
+
+            bindEvents() {
+                // Navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const section = e.currentTarget.getAttribute('href').substring(1);
+                        this.showSection(section);
+                    });
+                });
+
+                // Logout
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    AuthManager.logout();
+                });
+
+                // Filters
+                document.getElementById('pending-filter')?.addEventListener('change', () => {
+                    this.filterPendingBookings();
+                });
+
+                document.getElementById('active-filter')?.addEventListener('change', () => {
+                    this.filterActiveBookings();
+                });
+
+                document.getElementById('active-search')?.addEventListener('input', () => {
+                    this.searchActiveBookings();
+                });
+
+                // Modal close
+                document.getElementById('close-modal')?.addEventListener('click', () => {
+                    document.getElementById('booking-action-modal').classList.add('hidden');
+                });
+            }
+
+            showSection(sectionName) {
+                // Hide all sections
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.add('hidden');
+                });
+
+                // Update navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('bg-blue-50', 'text-blue-600', 'font-medium');
+                    item.classList.add('text-gray-600');
+                });
+
+                // Show selected section
+                const targetSection = document.getElementById(`${sectionName}-section`);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                }
+
+                // Update navigation active state
+                const activeNav = document.querySelector(`[href="#${sectionName}"]`);
+                if (activeNav) {
+                    activeNav.classList.remove('text-gray-600');
+                    activeNav.classList.add('bg-blue-50', 'text-blue-600', 'font-medium');
+                }
+
+                this.currentSection = sectionName;
+                this.loadSectionData(sectionName);
+            }
+
+            loadSectionData(sectionName) {
+                switch (sectionName) {
+                    case 'pending':
+                        this.renderPendingBookings();
+                        break;
+                    case 'active':
+                        this.renderActiveBookings();
+                        break;
+                    case 'completed':
+                        this.renderCompletedBookings();
+                        break;
+                    case 'calendar':
+                        this.renderCalendar();
+                        break;
+                }
+            }
+
+            loadDashboardData() {
+                this.loadRecentActivity();
+            }
+
+            loadBookingData() {
+                // Mock booking data
+                this.pendingBookings = [
+                    {
+                        id: 'BK001',
+                        customer: 'John Doe',
+                        customerEmail: 'john@example.com',
+                        vehicle: 'Toyota Vios',
+                        pickupDate: '2025-06-22',
+                        returnDate: '2025-06-24',
+                        total: '₱4,500',
+                        status: 'pending',
+                        urgent: false
+                    },
+                    {
+                        id: 'BK002',
+                        customer: 'Jane Smith',
+                        customerEmail: 'jane@example.com',
+                        vehicle: 'Honda CRV',
+                        pickupDate: '2025-06-21',
+                        returnDate: '2025-06-23',
+                        total: '₱7,500',
+                        status: 'pending',
+                        urgent: true
+                    }
+                ];
+
+                this.activeBookings = [
+                    {
+                        id: 'BK003',
+                        customer: 'Mike Johnson',
+                        vehicle: 'Mitsubishi Adventure',
+                        pickupDate: '2025-06-20',
+                        returnDate: '2025-06-22',
+                        status: 'active'
+                    }
+                ];
+
+                this.completedBookings = [
+                    {
+                        id: 'BK004',
+                        customer: 'Sarah Wilson',
+                        vehicle: 'Toyota Vios',
+                        period: 'Jun 18-20, 2025',
+                        total: '₱4,500',
+                        rating: 5
+                    }
+                ];
+            }
+
+            loadRecentActivity() {
+                const activities = [
+                    { time: '10:30 AM', action: 'Confirmed booking BK001 for John Doe', type: 'confirm' },
+                    { time: '10:15 AM', action: 'Modified booking BK002 dates', type: 'modify' },
+                    { time: '9:45 AM', action: 'Cancelled booking BK005 by customer request', type: 'cancel' },
+                    { time: '9:30 AM', action: 'Vehicle returned - BK004 completed', type: 'complete' }
+                ];
+
+                const container = document.getElementById('recent-activity');
+                if (!container) return;
+
+                container.innerHTML = activities.map(activity => `
+                    <div class="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                        <div class="w-2 h-2 rounded-full ${
+                            activity.type === 'confirm' ? 'bg-green-500' :
+                            activity.type === 'modify' ? 'bg-blue-500' :
+                            activity.type === 'cancel' ? 'bg-red-500' :
+                            'bg-gray-500'
+                        }"></div>
+                        <div class="flex-1">
+                            <p class="text-sm">${activity.action}</p>
+                            <p class="text-xs text-gray-500">${activity.time}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            renderPendingBookings() {
+                const container = document.getElementById('pending-bookings-list');
+                if (!container) return;
+
+                container.innerHTML = this.pendingBookings.map(booking => `
+                    <div class="card ${booking.urgent ? 'border-l-4 border-red-500' : ''}">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                ${booking.urgent ? '<span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded mb-2 inline-block">URGENT</span>' : ''}
+                                <h3 class="text-lg font-semibold">${booking.id} - ${booking.customer}</h3>
+                                <p class="text-gray-600">${booking.vehicle}</p>
+                                <p class="text-gray-600">${booking.pickupDate} to ${booking.returnDate}</p>
+                                <p class="font-semibold text-blue-600">${booking.total}</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="bookingStaff.confirmBooking('${booking.id}')" class="btn btn-success">
+                                    ✓ Confirm
+                                </button>
+                                <button onclick="bookingStaff.modifyBooking('${booking.id}')" class="btn btn-secondary">
+                                    ✏️ Modify
+                                </button>
+                                <button onclick="bookingStaff.cancelBooking('${booking.id}')" class="btn btn-error">
+                                    ✗ Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            renderActiveBookings() {
+                const tbody = document.getElementById('active-bookings-table');
+                if (!tbody) return;
+
+                tbody.innerHTML = this.activeBookings.map(booking => `
+                    <tr class="border-b border-gray-100">
+                        <td class="py-3 px-4">${booking.id}</td>
+                        <td class="py-3 px-4">${booking.customer}</td>
+                        <td class="py-3 px-4">${booking.vehicle}</td>
+                        <td class="py-3 px-4">${booking.pickupDate}</td>
+                        <td class="py-3 px-4">${booking.returnDate}</td>
+                        <td class="py-3 px-4">
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">${booking.status}</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <button onclick="bookingStaff.viewBookingDetails('${booking.id}')" class="text-blue-600 hover:underline text-sm mr-2">
+                                View
+                            </button>
+                            <button onclick="bookingStaff.completeBooking('${booking.id}')" class="text-green-600 hover:underline text-sm">
+                                Complete
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            renderCompletedBookings() {
+                const tbody = document.getElementById('completed-bookings-table');
+                if (!tbody) return;
+
+                tbody.innerHTML = this.completedBookings.map(booking => `
+                    <tr class="border-b border-gray-100">
+                        <td class="py-3 px-4">${booking.id}</td>
+                        <td class="py-3 px-4">${booking.customer}</td>
+                        <td class="py-3 px-4">${booking.vehicle}</td>
+                        <td class="py-3 px-4">${booking.period}</td>
+                        <td class="py-3 px-4">${booking.total}</td>
+                        <td class="py-3 px-4">
+                            <div class="flex items-center">
+                                ${'★'.repeat(booking.rating)}${'☆'.repeat(5 - booking.rating)}
+                                <span class="ml-1 text-xs text-gray-600">(${booking.rating})</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <button onclick="bookingStaff.viewBookingDetails('${booking.id}')" class="text-blue-600 hover:underline text-sm">
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            renderCalendar() {
+                const grid = document.getElementById('calendar-grid');
+                if (!grid) return;
+
+                // Simple calendar for current month
+                const today = new Date();
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                const startDate = new Date(firstDay);
+                startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+                const days = [];
+                for (let i = 0; i < 42; i++) {
+                    const date = new Date(startDate);
+                    date.setDate(startDate.getDate() + i);
+                    days.push(date);
+                }
+
+                grid.innerHTML = days.map(date => {
+                    const isCurrentMonth = date.getMonth() === today.getMonth();
+                    const isToday = date.toDateString() === today.toDateString();
+                    const hasBookings = Math.random() > 0.7; // Mock booking indicator
+
+                    return `
+                        <div class="h-20 border border-gray-200 p-1 ${
+                            isCurrentMonth ? 'bg-white' : 'bg-gray-50'
+                        } ${isToday ? 'bg-blue-50 border-blue-300' : ''}">
+                            <div class="text-xs ${isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}">${date.getDate()}</div>
+                            ${hasBookings ? '<div class="w-2 h-2 bg-blue-500 rounded-full mt-1"></div>' : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            confirmBooking(bookingId) {
+                if (confirm(`Confirm booking ${bookingId}?`)) {
+                    // Update booking status
+                    const booking = this.pendingBookings.find(b => b.id === bookingId);
+                    if (booking) {
+                        booking.status = 'confirmed';
+                        this.activeBookings.push(booking);
+                        this.pendingBookings = this.pendingBookings.filter(b => b.id !== bookingId);
+                        
+                        // Update counters
+                        document.getElementById('pending-count').textContent = this.pendingBookings.length;
+                        document.getElementById('active-count').textContent = this.activeBookings.length;
+                        
+                        alert(`Booking ${bookingId} confirmed successfully!`);
+                        this.renderPendingBookings();
+                    }
+                }
+            }
+
+            modifyBooking(bookingId) {
+                const booking = this.pendingBookings.find(b => b.id === bookingId);
+                if (!booking) return;
+
+                document.getElementById('modal-title').textContent = 'Modify Booking';
+                document.getElementById('modal-content').innerHTML = `
+                    <form id="modify-booking-form" class="space-y-4">
+                        <input type="hidden" name="bookingId" value="${bookingId}">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="form-label">Pickup Date</label>
+                                <input type="date" name="pickupDate" value="${booking.pickupDate}" class="form-input" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Return Date</label>
+                                <input type="date" name="returnDate" value="${booking.returnDate}" class="form-input" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label">Notes</label>
+                            <textarea name="notes" class="form-input" rows="3" placeholder="Reason for modification..."></textarea>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" onclick="document.getElementById('booking-action-modal').classList.add('hidden')" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </form>
+                `;
+
+                document.getElementById('modify-booking-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    booking.pickupDate = formData.get('pickupDate');
+                    booking.returnDate = formData.get('returnDate');
+                    
+                    alert('Booking modified successfully!');
+                    document.getElementById('booking-action-modal').classList.add('hidden');
+                    this.renderPendingBookings();
+                });
+
+                document.getElementById('booking-action-modal').classList.remove('hidden');
+            }
+
+            cancelBooking(bookingId) {
+                if (confirm(`Cancel booking ${bookingId}? This action cannot be undone.`)) {
+                    this.pendingBookings = this.pendingBookings.filter(b => b.id !== bookingId);
+                    document.getElementById('pending-count').textContent = this.pendingBookings.length;
+                    
+                    alert(`Booking ${bookingId} cancelled successfully!`);
+                    this.renderPendingBookings();
+                }
+            }
+
+            completeBooking(bookingId) {
+                if (confirm(`Mark booking ${bookingId} as completed?`)) {
+                    const booking = this.activeBookings.find(b => b.id === bookingId);
+                    if (booking) {
+                        booking.status = 'completed';
+                        this.completedBookings.unshift({
+                            ...booking,
+                            period: `${booking.pickupDate} to ${booking.returnDate}`,
+                            total: '₱4,500',
+                            rating: 5
+                        });
+                        this.activeBookings = this.activeBookings.filter(b => b.id !== bookingId);
+                        
+                        // Update counters
+                        document.getElementById('active-count').textContent = this.activeBookings.length;
+                        document.getElementById('completed-today').textContent = this.completedBookings.length;
+                        
+                        alert(`Booking ${bookingId} completed successfully!`);
+                        this.renderActiveBookings();
+                    }
+                }
+            }
+
+            viewBookingDetails(bookingId) {
+                // Find booking in any list
+                let booking = this.pendingBookings.find(b => b.id === bookingId) ||
+                            this.activeBookings.find(b => b.id === bookingId) ||
+                            this.completedBookings.find(b => b.id === bookingId);
+
+                if (!booking) return;
+
+                document.getElementById('modal-title').textContent = `Booking Details - ${bookingId}`;
+                document.getElementById('modal-content').innerHTML = `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm text-gray-600">Customer</label>
+                                <p class="font-semibold">${booking.customer}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600">Status</label>
+                                <p class="font-semibold">${booking.status}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">Vehicle</label>
+                            <p class="font-semibold">${booking.vehicle}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm text-gray-600">Pickup Date</label>
+                                <p class="font-semibold">${booking.pickupDate}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-600">Return Date</label>
+                                <p class="font-semibold">${booking.returnDate}</p>
+                            </div>
+                        </div>
+                        ${booking.total ? `
+                            <div>
+                                <label class="text-sm text-gray-600">Total Amount</label>
+                                <p class="font-semibold text-lg text-blue-600">${booking.total}</p>
+                            </div>
+                        ` : ''}
+                        ${booking.customerEmail ? `
+                            <div>
+                                <label class="text-sm text-gray-600">Customer Email</label>
+                                <p class="font-semibold">${booking.customerEmail}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                document.getElementById('booking-action-modal').classList.remove('hidden');
+            }
+
+            filterPendingBookings() {
+                // Implement filtering logic
+                this.renderPendingBookings();
+            }
+
+            filterActiveBookings() {
+                // Implement filtering logic
+                this.renderActiveBookings();
+            }
+
+            searchActiveBookings() {
+                // Implement search logic
+                this.renderActiveBookings();
+            }
+
+            refreshPendingBookings() {
+                this.loadBookingData();
+                this.renderPendingBookings();
+                alert('Pending bookings refreshed!');
+            }
+
+            exportBookings() {
+                const csvContent = "data:text/csv;charset=utf-8," + 
+                    "Booking ID,Customer,Vehicle,Pickup Date,Return Date,Status,Total\\n" +
+                    [...this.pendingBookings, ...this.activeBookings, ...this.completedBookings]
+                        .map(b => `${b.id},${b.customer},${b.vehicle},${b.pickupDate},${b.returnDate},${b.status},${b.total || 'N/A'}`)
+                        .join("\\n");
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `bookings-${new Date().toISOString().split('T')[0]}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            exportCompleted() {
+                const csvContent = "data:text/csv;charset=utf-8," + 
+                    "Booking ID,Customer,Vehicle,Period,Total,Rating\\n" +
+                    this.completedBookings
+                        .map(b => `${b.id},${b.customer},${b.vehicle},${b.period},${b.total},${b.rating}`)
+                        .join("\\n");
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `completed-bookings-${new Date().toISOString().split('T')[0]}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            changeCalendarView(view) {
+                // Implement calendar view change
+                alert(`Calendar view changed to ${view}`);
+            }
+        }
+
+        // Initialize booking staff dashboard
+        const bookingStaff = new BookingStaffDashboard();
+    </script>
+</body>
+</html>
