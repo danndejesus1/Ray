@@ -8,13 +8,17 @@
     <title>CarGo</title>    <meta name="theme-color" content="#34B2DF">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png"> 
-    <link rel="icon" type="image/x-icon" href="./icons/favicon.ico"> 
-    
+    <link rel="icon" type="image/x-icon" href="./icons/favicon.ico">    
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Outfit:wght@700&display=swap" rel="stylesheet">
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
+    <!-- Load Core Scripts -->
+    <script src="./config/app.config.js"></script>
+    <script src="./modules/api/api.js"></script>
+    <script src="./modules/utils/contact-form.js"></script>
 
     <style>
         body {
@@ -338,24 +342,17 @@
                         }
                     }
                 });
-            });
-
-            // Filter functionality (visual only)
+            });            // Filter functionality (visual only)
             const applyFilterButton = document.getElementById('apply-filter-button');
             if (applyFilterButton) {
                 applyFilterButton.addEventListener('click', () => {
                     alert('Filter functionality is available in the full version with backend integration.');
                 });
             }
-
-            // Contact Form
-            contactForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                showResponseMessage(contactResponseMessage, 'Thank you for your message! We will get back to you soon.', true);
-                contactForm.reset();
-            });
+            
+            // Initialize API
+            window.API = new APIManager();
         });
-    </script>
     </script>
 </body>
 </html>

@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Booking - CarGo</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="booking-container">
+        <div class="booking-header">
+            <button class="btn btn-outline back-btn" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+            <h1>Book Your Vehicle</h1>
+            <div class="booking-steps">
+                <div class="step active" data-step="1">
+                    <span class="step-number">1</span>
+                    <span class="step-label">Details</span>
+                </div>
+                <div class="step" data-step="2">
+                    <span class="step-number">2</span>
+                    <span class="step-label">Extras</span>
+                </div>
+                <div class="step" data-step="3">
+                    <span class="step-number">3</span>
+                    <span class="step-label">Payment</span>
+                </div>
+                <div class="step" data-step="4">
+                    <span class="step-number">4</span>
+                    <span class="step-label">Confirm</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="booking-content">
+            <!-- Step 1: Booking Details -->
+            <div class="booking-step active" id="step-1">
+                <div class="booking-main">
+                    <div class="booking-form">
+                        <h2>Booking Details</h2>
+                        
+                        <form id="booking-details-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="pickup-location">Pickup Location</label>
+                                    <div class="location-input">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <input type="text" id="pickup-location" name="pickupLocation" required 
+                                               placeholder="Enter pickup location">
+                                        <button type="button" class="location-btn" onclick="getCurrentLocation('pickup')">
+                                            <i class="fas fa-crosshairs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="dropoff-location">Drop-off Location</label>
+                                    <div class="location-input">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <input type="text" id="dropoff-location" name="dropoffLocation" required 
+                                               placeholder="Enter drop-off location">
+                                        <button type="button" class="location-btn" onclick="getCurrentLocation('dropoff')">
+                                            <i class="fas fa-crosshairs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="pickup-date">Pickup Date & Time</label>
+                                    <div class="datetime-input">
+                                        <input type="date" id="pickup-date" name="pickupDate" required>
+                                        <input type="time" id="pickup-time" name="pickupTime" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="dropoff-date">Drop-off Date & Time</label>
+                                    <div class="datetime-input">
+                                        <input type="date" id="dropoff-date" name="dropoffDate" required>
+                                        <input type="time" id="dropoff-time" name="dropoffTime" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="driver-age">Driver's Age</label>
+                                <select id="driver-age" name="driverAge" required>
+                                    <option value="">Select age range</option>
+                                    <option value="21-24">21-24 years</option>
+                                    <option value="25-29">25-29 years</option>
+                                    <option value="30-64">30-64 years</option>
+                                    <option value="65+">65+ years</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="different-driver" name="differentDriver">
+                                    Someone else will be driving
+                                </label>
+                            </div>
+
+                            <div id="additional-driver" class="additional-info" style="display: none;">
+                                <h3>Additional Driver Information</h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="driver-name">Driver's Name</label>
+                                        <input type="text" id="driver-name" name="driverName" 
+                                               placeholder="Enter driver's full name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="driver-license">License Number</label>
+                                        <input type="text" id="driver-license" name="driverLicense" 
+                                               placeholder="Enter license number">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="booking-sidebar">
+                    <div class="selected-vehicle" id="selected-vehicle-card">
+                        <!-- Vehicle details will be populated here -->
+                    </div>
+                    
+                    <div class="booking-summary">
+                        <h3>Booking Summary</h3>
+                        <div class="summary-item">
+                            <span>Duration:</span>
+                            <span id="booking-duration">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Base Rate:</span>
+                            <span id="base-rate">$0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Additional Fees:</span>
+                            <span id="additional-fees">$0.00</span>
+                        </div>
+                        <div class="summary-item total">
+                            <span>Total:</span>
+                            <span id="total-amount">$0.00</span>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary btn-full" onclick="nextStep()">
+                        Continue to Extras
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Extras -->
+            <div class="booking-step" id="step-2">
+                <div class="booking-main">
+                    <h2>Add Extras</h2>
+                    <p>Enhance your trip with our optional extras</p>
+
+                    <div class="extras-grid">
+                        <div class="extra-item" data-extra="gps">
+                            <div class="extra-icon">
+                                <i class="fas fa-map"></i>
+                            </div>
+                            <div class="extra-info">
+                                <h4>GPS Navigation</h4>
+                                <p>Never get lost with our GPS system</p>
+                                <span class="extra-price">$5.00/day</span>
+                            </div>
+                            <div class="extra-quantity">
+                                <button type="button" class="quantity-btn" onclick="updateQuantity('gps', -1)">-</button>
+                                <span class="quantity" id="gps-quantity">0</span>
+                                <button type="button" class="quantity-btn" onclick="updateQuantity('gps', 1)">+</button>
+                            </div>
+                        </div>
+
+                        <div class="extra-item" data-extra="childSeat">
+                            <div class="extra-icon">
+                                <i class="fas fa-baby"></i>
+                            </div>
+                            <div class="extra-info">
+                                <h4>Child Seat</h4>
+                                <p>Safety first for your little ones</p>
+                                <span class="extra-price">$8.00/day</span>
+                            </div>
+                            <div class="extra-quantity">
+                                <button type="button" class="quantity-btn" onclick="updateQuantity('childSeat', -1)">-</button>
+                                <span class="quantity" id="childSeat-quantity">0</span>
+                                <button type="button" class="quantity-btn" onclick="updateQuantity('childSeat', 1)">+</button>
+                            </div>
+                        </div>
+
+                        <div class="extra-item" data-extra="wifi">
+                            <div class="extra-icon">
+                                <i class="fas fa-wifi"></i>
+                            </div>
+                            <div class="extra-info">
+                                <h4>Portable WiFi</h4>
+                                <p>Stay connected on the road</p>
+                                <span class="extra-price">$10.00/day</span>
+                            </div>
+                            <div class="extra-quantity">
+                                <button type="button" class="quantity-btn" onclick="updateQuantity('wifi', -1)">-</button>
+                                <span class="quantity" id="wifi-quantity">0</span>
+                                <button type="button" class="quantity-btn" onclick="updateQuantity('wifi', 1)">+</button>
+                            </div>
+                        </div>
+
+                        <div class="extra-item" data-extra="insurance">
+                            <div class="extra-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="extra-info">
+                                <h4>Full Coverage Insurance</h4>
+                                <p>Complete peace of mind</p>
+                                <span class="extra-price">$15.00/day</span>
+                            </div>
+                            <div class="extra-quantity">
+                                <button type="button" class="quantity-btn" onclick="updateQuantity('insurance', -1)">-</button>
+                                <span class="quantity" id="insurance-quantity">0</span>
+                                <button type="button" class="quantity-btn" onclick="updateQuantity('insurance', 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-sidebar">
+                    <div class="booking-summary">
+                        <h3>Updated Summary</h3>
+                        <div class="summary-item">
+                            <span>Base Rate:</span>
+                            <span id="base-rate-2">$0.00</span>
+                        </div>
+                        <div id="extras-breakdown"></div>
+                        <div class="summary-item">
+                            <span>Taxes & Fees:</span>
+                            <span id="taxes-fees">$0.00</span>
+                        </div>
+                        <div class="summary-item total">
+                            <span>Total:</span>
+                            <span id="total-amount-2">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="booking-actions">
+                        <button type="button" class="btn btn-outline btn-full" onclick="previousStep()">
+                            Back
+                        </button>
+                        <button type="button" class="btn btn-primary btn-full" onclick="nextStep()">
+                            Continue to Payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Payment -->
+            <div class="booking-step" id="step-3">
+                <div class="booking-main">
+                    <h2>Payment Information</h2>
+                    
+                    <div class="payment-methods">
+                        <h3>Select Payment Method</h3>
+                        <div id="payment-methods-list">
+                            <!-- Payment methods will be populated here -->
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline" onclick="showAddPaymentMethod()">
+                            <i class="fas fa-plus"></i>
+                            Add New Payment Method
+                        </button>
+                    </div>
+
+                    <div class="billing-info">
+                        <h3>Billing Information</h3>
+                        <form id="billing-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="billing-name">Full Name</label>
+                                    <input type="text" id="billing-name" name="billingName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="billing-email">Email</label>
+                                    <input type="email" id="billing-email" name="billingEmail" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="billing-address">Address</label>
+                                <input type="text" id="billing-address" name="billingAddress" required>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="billing-city">City</label>
+                                    <input type="text" id="billing-city" name="billingCity" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="billing-state">State</label>
+                                    <input type="text" id="billing-state" name="billingState" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="billing-zip">ZIP Code</label>
+                                    <input type="text" id="billing-zip" name="billingZip" required>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="booking-sidebar">
+                    <div class="booking-summary">
+                        <h3>Final Summary</h3>
+                        <div class="summary-breakdown" id="final-breakdown">
+                            <!-- Final breakdown will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="booking-actions">
+                        <button type="button" class="btn btn-outline btn-full" onclick="previousStep()">
+                            Back
+                        </button>
+                        <button type="button" class="btn btn-primary btn-full" onclick="nextStep()">
+                            Review Booking
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Confirmation -->
+            <div class="booking-step" id="step-4">
+                <div class="booking-main">
+                    <h2>Confirm Your Booking</h2>
+                    
+                    <div class="booking-review" id="booking-review">
+                        <!-- Booking review will be populated here -->
+                    </div>
+
+                    <div class="terms-conditions">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="accept-terms" required>
+                            <span class="checkmark"></span>
+                            I agree to the <a href="#" target="_blank">Terms and Conditions</a> and <a href="#" target="_blank">Privacy Policy</a>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="booking-sidebar">
+                    <div class="booking-summary">
+                        <h3>Payment Summary</h3>
+                        <div id="payment-summary">
+                            <!-- Payment summary will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="booking-actions">
+                        <button type="button" class="btn btn-outline btn-full" onclick="previousStep()">
+                            Back
+                        </button>
+                        <button type="button" class="btn btn-success btn-full" id="confirm-booking-btn" onclick="confirmBooking()">
+                            <i class="fas fa-lock"></i>
+                            Confirm & Pay
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Payment Method Modal -->
+    <div id="add-payment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Payment Method</h3>
+                <button class="modal-close" onclick="closeModal('add-payment-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-payment-form">
+                    <div class="form-group">
+                        <label for="card-number">Card Number</label>
+                        <input type="text" id="card-number" name="cardNumber" required 
+                               placeholder="1234 5678 9012 3456" maxlength="19">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expiry-date">Expiry Date</label>
+                            <input type="text" id="expiry-date" name="expiryDate" required 
+                                   placeholder="MM/YY" maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV</label>
+                            <input type="text" id="cvv" name="cvv" required 
+                                   placeholder="123" maxlength="4">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="card-name">Name on Card</label>
+                        <input type="text" id="card-name" name="cardName" required 
+                               placeholder="John Doe">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="save-card">
+                            <span class="checkmark"></span>
+                            Save this card for future use
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">Add Payment Method</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../config/app.config.js"></script>
+    <script src="../../modules/utils/utils.js"></script>
+    <script src="../../modules/storage/storage.js"></script>
+    <script src="../../modules/api/api.js"></script>
+    <script src="../../modules/notifications/notifications.js"></script>
+    <script src="../../components/auth/auth.js"></script>
+    <script src="../../components/booking/booking.js"></script>
+    <script src="../../components/vehicle/vehicle.js"></script>
+    <script src="../../components/payment/payment.js"></script>
+
+    <script>
+        let currentStep = 1;
+        let bookingData = {
+            vehicle: null,
+            details: {},
+            extras: {},
+            payment: {},
+            billing: {}
+        };
+
+        // Initialize booking form
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSelectedVehicle();
+            setupFormHandlers();
+            setMinDateTime();
+            loadPaymentMethods();
+        });
+
+        function loadSelectedVehicle() {
+            const vehicleId = window.Utils.Url.getQueryParams().vehicleId;
+            if (vehicleId) {
+                // Load vehicle details
+                const vehicle = window.vehicleManager.getVehicleById(vehicleId);
+                if (vehicle) {
+                    bookingData.vehicle = vehicle;
+                    renderSelectedVehicle(vehicle);
+                }
+            }
+        }
+
+        function renderSelectedVehicle(vehicle) {
+            const container = document.getElementById('selected-vehicle-card');
+            container.innerHTML = `
+                <div class="vehicle-card selected">
+                    <img src="${vehicle.image}" alt="${vehicle.name}">
+                    <div class="vehicle-info">
+                        <h3>${vehicle.name}</h3>
+                        <p class="vehicle-category">${vehicle.category}</p>
+                        <div class="vehicle-features">
+                            <span><i class="fas fa-users"></i> ${vehicle.passengers}</span>
+                            <span><i class="fas fa-suitcase"></i> ${vehicle.luggage}</span>
+                            <span><i class="fas fa-cog"></i> ${vehicle.transmission}</span>
+                        </div>
+                        <div class="vehicle-price">
+                            <span class="price">${window.Utils.Currency.format(vehicle.price)}/day</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function setupFormHandlers() {
+            // Date/time change handlers
+            document.getElementById('pickup-date').addEventListener('change', calculateDuration);
+            document.getElementById('pickup-time').addEventListener('change', calculateDuration);
+            document.getElementById('dropoff-date').addEventListener('change', calculateDuration);
+            document.getElementById('dropoff-time').addEventListener('change', calculateDuration);
+
+            // Different driver checkbox
+            document.getElementById('different-driver').addEventListener('change', (e) => {
+                const additionalDriver = document.getElementById('additional-driver');
+                additionalDriver.style.display = e.target.checked ? 'block' : 'none';
+                
+                const driverInputs = additionalDriver.querySelectorAll('input');
+                driverInputs.forEach(input => {
+                    input.required = e.target.checked;
+                });
+            });
+        }
+
+        function setMinDateTime() {
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const currentTime = now.toTimeString().slice(0, 5);
+            
+            document.getElementById('pickup-date').min = today;
+            document.getElementById('dropoff-date').min = today;
+            
+            // Set default pickup to 2 hours from now
+            const pickup = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+            document.getElementById('pickup-date').value = pickup.toISOString().split('T')[0];
+            document.getElementById('pickup-time').value = pickup.toTimeString().slice(0, 5);
+            
+            // Set default dropoff to 24 hours later
+            const dropoff = new Date(pickup.getTime() + 24 * 60 * 60 * 1000);
+            document.getElementById('dropoff-date').value = dropoff.toISOString().split('T')[0];
+            document.getElementById('dropoff-time').value = dropoff.toTimeString().slice(0, 5);
+            
+            calculateDuration();
+        }
+
+        function calculateDuration() {
+            const pickupDate = document.getElementById('pickup-date').value;
+            const pickupTime = document.getElementById('pickup-time').value;
+            const dropoffDate = document.getElementById('dropoff-date').value;
+            const dropoffTime = document.getElementById('dropoff-time').value;
+
+            if (pickupDate && pickupTime && dropoffDate && dropoffTime) {
+                const pickup = new Date(`${pickupDate}T${pickupTime}`);
+                const dropoff = new Date(`${dropoffDate}T${dropoffTime}`);
+                
+                if (dropoff > pickup) {
+                    const duration = window.Utils.Date.formatDuration(pickup, dropoff);
+                    document.getElementById('booking-duration').textContent = duration;
+                    
+                    // Calculate pricing
+                    updatePricing(pickup, dropoff);
+                } else {
+                    document.getElementById('booking-duration').textContent = 'Invalid dates';
+                }
+            }
+        }
+
+        function updatePricing(pickupDate, dropoffDate) {
+            if (!bookingData.vehicle) return;
+            
+            const days = Math.ceil((dropoffDate - pickupDate) / (1000 * 60 * 60 * 24));
+            const baseRate = bookingData.vehicle.price * days;
+            
+            document.getElementById('base-rate').textContent = window.Utils.Currency.format(baseRate);
+            document.getElementById('base-rate-2').textContent = window.Utils.Currency.format(baseRate);
+            
+            updateTotalPricing();
+        }
+
+        function updateTotalPricing() {
+            const baseRate = window.Utils.Currency.parseNumber(document.getElementById('base-rate').textContent);
+            const additionalFees = calculateExtras();
+            const taxes = baseRate * 0.08; // 8% tax
+            const total = baseRate + additionalFees + taxes;
+            
+            document.getElementById('additional-fees').textContent = window.Utils.Currency.format(additionalFees);
+            document.getElementById('taxes-fees').textContent = window.Utils.Currency.format(taxes);
+            document.getElementById('total-amount').textContent = window.Utils.Currency.format(total);
+            document.getElementById('total-amount-2').textContent = window.Utils.Currency.format(total);
+        }
+
+        function calculateExtras() {
+            const extras = {
+                gps: { price: 5, quantity: parseInt(document.getElementById('gps-quantity').textContent) },
+                childSeat: { price: 8, quantity: parseInt(document.getElementById('childSeat-quantity').textContent) },
+                wifi: { price: 10, quantity: parseInt(document.getElementById('wifi-quantity').textContent) },
+                insurance: { price: 15, quantity: parseInt(document.getElementById('insurance-quantity').textContent) }
+            };
+
+            let total = 0;
+            const breakdown = document.getElementById('extras-breakdown');
+            breakdown.innerHTML = '';
+
+            Object.entries(extras).forEach(([key, extra]) => {
+                if (extra.quantity > 0) {
+                    const cost = extra.price * extra.quantity;
+                    total += cost;
+                    
+                    breakdown.innerHTML += `
+                        <div class="summary-item">
+                            <span>${key.charAt(0).toUpperCase() + key.slice(1)} (${extra.quantity}x):</span>
+                            <span>${window.Utils.Currency.format(cost)}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            return total;
+        }
+
+        function updateQuantity(extra, change) {
+            const quantityEl = document.getElementById(`${extra}-quantity`);
+            let quantity = parseInt(quantityEl.textContent) + change;
+            quantity = Math.max(0, Math.min(5, quantity)); // Limit 0-5
+            quantityEl.textContent = quantity;
+            
+            updateTotalPricing();
+        }
+
+        function nextStep() {
+            if (validateCurrentStep()) {
+                saveStepData();
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        function previousStep() {
+            currentStep--;
+            showStep(currentStep);
+        }
+
+        function showStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.booking-step').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            
+            // Show current step
+            document.getElementById(`step-${step}`).classList.add('active');
+            document.querySelector(`[data-step="${step}"]`).classList.add('active');
+            
+            // Update step-specific content
+            if (step === 3) {
+                loadPaymentMethods();
+                populateBillingInfo();
+            } else if (step === 4) {
+                generateBookingReview();
+            }
+        }
+
+        function validateCurrentStep() {
+            switch (currentStep) {
+                case 1:
+                    return validateBookingDetails();
+                case 2:
+                    return true; // Extras are optional
+                case 3:
+                    return validatePaymentInfo();
+                default:
+                    return true;
+            }
+        }
+
+        function validateBookingDetails() {
+            const form = document.getElementById('booking-details-form');
+            const formData = new FormData(form);
+            
+            // Basic form validation
+            const requiredFields = ['pickupLocation', 'dropoffLocation', 'pickupDate', 'pickupTime', 'dropoffDate', 'dropoffTime', 'driverAge'];
+            
+            for (const field of requiredFields) {
+                if (!formData.get(field)) {
+                    window.notificationManager.showError(`Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`);
+                    return false;
+                }
+            }
+            
+            // Date validation
+            const pickup = new Date(`${formData.get('pickupDate')}T${formData.get('pickupTime')}`);
+            const dropoff = new Date(`${formData.get('dropoffDate')}T${formData.get('dropoffTime')}`);
+            
+            if (pickup >= dropoff) {
+                window.notificationManager.showError('Drop-off must be after pickup');
+                return false;
+            }
+            
+            if (pickup < new Date()) {
+                window.notificationManager.showError('Pickup date cannot be in the past');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function validatePaymentInfo() {
+            const selectedPayment = document.querySelector('.payment-method.selected');
+            if (!selectedPayment) {
+                window.notificationManager.showError('Please select a payment method');
+                return false;
+            }
+            
+            const billingForm = document.getElementById('billing-form');
+            const formData = new FormData(billingForm);
+            
+            const requiredFields = ['billingName', 'billingEmail', 'billingAddress', 'billingCity', 'billingState', 'billingZip'];
+            
+            for (const field of requiredFields) {
+                if (!formData.get(field)) {
+                    window.notificationManager.showError('Please fill in all billing information');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        function saveStepData() {
+            switch (currentStep) {
+                case 1:
+                    const detailsForm = document.getElementById('booking-details-form');
+                    bookingData.details = Object.fromEntries(new FormData(detailsForm));
+                    break;
+                case 2:
+                    // Save extras
+                    bookingData.extras = {
+                        gps: parseInt(document.getElementById('gps-quantity').textContent),
+                        childSeat: parseInt(document.getElementById('childSeat-quantity').textContent),
+                        wifi: parseInt(document.getElementById('wifi-quantity').textContent),
+                        insurance: parseInt(document.getElementById('insurance-quantity').textContent)
+                    };
+                    break;
+                case 3:
+                    const billingForm = document.getElementById('billing-form');
+                    bookingData.billing = Object.fromEntries(new FormData(billingForm));
+                    const selectedPayment = document.querySelector('.payment-method.selected');
+                    bookingData.payment.methodId = selectedPayment?.dataset.methodId;
+                    break;
+            }
+        }
+
+        async function loadPaymentMethods() {
+            await window.paymentManager.loadPaymentMethods();
+            const container = document.getElementById('payment-methods-list');
+            
+            container.innerHTML = window.paymentManager.paymentMethods.map(method => `
+                <div class="payment-method ${method.isDefault ? 'selected' : ''}" data-method-id="${method.id}">
+                    <div class="payment-icon">
+                        <i class="fab fa-cc-${method.brand}"></i>
+                    </div>
+                    <div class="payment-info">
+                        <span class="payment-brand">${method.brand.toUpperCase()}</span>
+                        <span class="payment-number">•••• •••• •••• ${method.last4}</span>
+                        ${method.isDefault ? '<span class="default-badge">Default</span>' : ''}
+                    </div>
+                    <div class="payment-radio">
+                        <input type="radio" name="payment-method" value="${method.id}" ${method.isDefault ? 'checked' : ''}>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Add click handlers
+            container.querySelectorAll('.payment-method').forEach(method => {
+                method.addEventListener('click', () => {
+                    container.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+                    method.classList.add('selected');
+                    method.querySelector('input[type="radio"]').checked = true;
+                });
+            });
+        }
+
+        function populateBillingInfo() {
+            const user = window.authManager.getCurrentUser();
+            if (user) {
+                document.getElementById('billing-name').value = user.name || '';
+                document.getElementById('billing-email').value = user.email || '';
+                // Populate other fields from user profile if available
+            }
+        }
+
+        function generateBookingReview() {
+            const container = document.getElementById('booking-review');
+            container.innerHTML = `
+                <div class="review-section">
+                    <h3>Vehicle</h3>
+                    <div class="review-vehicle">
+                        <img src="${bookingData.vehicle.image}" alt="${bookingData.vehicle.name}">
+                        <div>
+                            <h4>${bookingData.vehicle.name}</h4>
+                            <p>${bookingData.vehicle.category}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="review-section">
+                    <h3>Booking Details</h3>
+                    <div class="review-details">
+                        <div class="detail-item">
+                            <span>Pickup:</span>
+                            <span>${bookingData.details.pickupLocation} - ${window.Utils.Date.formatDate(bookingData.details.pickupDate)} ${bookingData.details.pickupTime}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>Drop-off:</span>
+                            <span>${bookingData.details.dropoffLocation} - ${window.Utils.Date.formatDate(bookingData.details.dropoffDate)} ${bookingData.details.dropoffTime}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="review-section">
+                    <h3>Extras</h3>
+                    <div class="review-extras">
+                        ${Object.entries(bookingData.extras).filter(([key, qty]) => qty > 0).map(([key, qty]) => 
+                            `<div class="extra-item">
+                                <span>${key.charAt(0).toUpperCase() + key.slice(1)}</span>
+                                <span>Quantity: ${qty}</span>
+                            </div>`
+                        ).join('') || '<p>No extras selected</p>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function confirmBooking() {
+            if (!document.getElementById('accept-terms').checked) {
+                window.notificationManager.showError('Please accept the terms and conditions');
+                return;
+            }
+            
+            const confirmBtn = document.getElementById('confirm-booking-btn');
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            try {
+                // Create booking
+                const booking = await window.bookingManager.createBooking(bookingData);
+                
+                // Process payment
+                const total = window.Utils.Currency.parseNumber(document.getElementById('total-amount-2').textContent);
+                await window.paymentManager.processPayment(booking.id, total, bookingData.payment.methodId);
+                
+                // Show success and redirect
+                window.notificationManager.showSuccess('Booking confirmed successfully!');
+                window.location.href = `/pages/user/booking-details.html?id=${booking.id}`;
+                
+            } catch (error) {
+                console.error('Booking confirmation error:', error);
+                window.notificationManager.showError('Failed to confirm booking. Please try again.');
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="fas fa-lock"></i> Confirm & Pay';
+            }
+        }
+
+        function getCurrentLocation(type) {
+            if (!window.Utils.Device.hasGeolocation()) {
+                window.notificationManager.showError('Geolocation is not supported');
+                return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    // In a real app, you'd reverse geocode the coordinates
+                    const { latitude, longitude } = position.coords;
+                    const input = document.getElementById(`${type}-location`);
+                    input.value = `Current Location (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+                },
+                error => {
+                    window.notificationManager.showError('Could not get your location');
+                }
+            );
+        }
+
+        function showAddPaymentMethod() {
+            document.getElementById('add-payment-modal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Add payment method form handler
+        document.getElementById('add-payment-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const paymentData = Object.fromEntries(formData);
+            
+            try {
+                await window.paymentManager.addPaymentMethod(paymentData);
+                closeModal('add-payment-modal');
+                loadPaymentMethods();
+                e.target.reset();
+            } catch (error) {
+                window.notificationManager.showError('Failed to add payment method');
+            }
+        });
+    </script>
+
+    <style>
+        .booking-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .booking-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .booking-steps {
+            display: flex;
+            gap: 20px;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .step.active {
+            opacity: 1;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--border-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step.active .step-number {
+            background: var(--primary-color);
+        }
+
+        .booking-content {
+            position: relative;
+        }
+
+        .booking-step {
+            display: none;
+        }
+
+        .booking-step.active {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        .booking-main {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .selected-vehicle {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .summary-item.total {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--primary-color);
+            border-bottom: none;
+            margin-top: 10px;
+            padding-top: 15px;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .location-input, .datetime-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .location-btn {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+
+        .extras-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .extra-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            transition: border-color 0.3s ease;
+        }
+
+        .extra-item:hover {
+            border-color: var(--primary-color);
+        }
+
+        .extra-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--background-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+
+        .extra-info {
+            flex: 1;
+        }
+
+        .extra-info h4 {
+            margin: 0 0 5px 0;
+        }
+
+        .extra-info p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .extra-price {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .extra-quantity {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity {
+            min-width: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .payment-methods {
+            margin-bottom: 30px;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method.selected {
+            border-color: var(--primary-color);
+            background: var(--background-light);
+        }
+
+        .payment-icon {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .payment-info {
+            flex: 1;
+        }
+
+        .default-badge {
+            background: var(--success-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .booking-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .booking-actions .btn {
+            flex: 1;
+        }
+
+        .terms-conditions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .review-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .review-vehicle {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .review-vehicle img {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        @media (max-width: 768px) {
+            .booking-step.active {
+                grid-template-columns: 1fr;
+            }
+            
+            .booking-steps {
+                display: none;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>

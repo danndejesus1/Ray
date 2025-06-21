@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CarGo</title>
+    <link rel="stylesheet" href="../../assets/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fas fa-car"></i>
+                    <span>CarGo</span>
+                </div>
+                <h1>Welcome Back</h1>
+                <p>Sign in to your account</p>
+            </div>
+
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" required 
+                               placeholder="Enter your email" autocomplete="email">
+                    </div>
+                    <div class="field-error" id="email-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" required 
+                               placeholder="Enter your password" autocomplete="current-password">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('password')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="field-error" id="password-error"></div>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="remember" name="remember">
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                    <a href="forgot-password.html" class="forgot-link">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="login-btn">
+                    <span class="btn-text">Sign In</span>
+                    <div class="btn-loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Signing in...
+                    </div>
+                </button>
+
+                <div class="form-divider">
+                    <span>or</span>
+                </div>
+
+                <div class="social-login">
+                    <button type="button" class="btn btn-outline btn-social" id="google-login">
+                        <i class="fab fa-google"></i>
+                        Continue with Google
+                    </button>
+                    <button type="button" class="btn btn-outline btn-social" id="facebook-login">
+                        <i class="fab fa-facebook-f"></i>
+                        Continue with Facebook
+                    </button>
+                </div>
+
+                <div class="auth-footer">
+                    <p>Don't have an account? <a href="register.html">Sign up</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Role Selection Modal -->
+    <div id="role-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Your Role</h3>
+            </div>
+            <div class="modal-body">
+                <p>Please select how you'd like to use CarGo:</p>
+                <div class="role-options">
+                    <button class="role-option" data-role="customer">
+                        <i class="fas fa-user"></i>
+                        <span class="role-title">Customer</span>
+                        <span class="role-description">Rent vehicles for personal use</span>
+                    </button>
+                    <button class="role-option" data-role="staff">
+                        <i class="fas fa-id-badge"></i>
+                        <span class="role-title">Staff</span>
+                        <span class="role-description">Manage bookings and customer service</span>
+                    </button>
+                    <button class="role-option" data-role="admin">
+                        <i class="fas fa-crown"></i>
+                        <span class="role-title">Admin</span>
+                        <span class="role-description">Full system administration</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../config/app.config.js"></script>
+    <script src="../../modules/utils/utils.js"></script>
+    <script src="../../modules/storage/storage.js"></script>
+    <script src="../../modules/api/api.js"></script>
+    <script src="../../modules/notifications/notifications.js"></script>
+    <script src="../../components/auth/auth.js"></script>
+
+    <script>
+        // Login form handling
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const loginData = {
+                email: formData.get('email'),
+                password: formData.get('password'),
+                remember: formData.has('remember')
+            };
+
+            // Clear previous errors
+            document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+
+            // Validate form
+            const validation = window.Utils.Validation.validateForm(loginData, {
+                email: { required: true, email: true },
+                password: { required: true, minLength: 6 }
+            });
+
+            if (!validation.isValid) {
+                Object.entries(validation.errors).forEach(([field, errors]) => {
+                    const errorEl = document.getElementById(`${field}-error`);
+                    if (errorEl) {
+                        errorEl.textContent = errors[0];
+                    }
+                });
+                return;
+            }
+
+            // Show loading state
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.classList.add('loading');
+            loginBtn.querySelector('.btn-text').style.display = 'none';
+            loginBtn.querySelector('.btn-loading').style.display = 'flex';
+
+            try {
+                const result = await window.authManager.login(loginData.email, loginData.password, loginData.remember);
+                
+                if (result.success) {
+                    // Check if user needs to select role
+                    if (result.user.roles && result.user.roles.length > 1) {
+                        showRoleModal(result.user.roles);
+                    } else {
+                        // Redirect based on user role
+                        redirectToRoleDashboard(result.user.role);
+                    }
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                // Show error message
+                if (error.message.includes('credentials')) {
+                    document.getElementById('password-error').textContent = 'Invalid email or password';
+                } else {
+                    window.notificationManager.showError('Login failed. Please try again.');
+                }
+            } finally {
+                // Hide loading state
+                loginBtn.classList.remove('loading');
+                loginBtn.querySelector('.btn-text').style.display = 'inline';
+                loginBtn.querySelector('.btn-loading').style.display = 'none';
+            }
+        });
+
+        // Social login handlers
+        document.getElementById('google-login').addEventListener('click', () => {
+            window.authManager.loginWithGoogle();
+        });
+
+        document.getElementById('facebook-login').addEventListener('click', () => {
+            window.authManager.loginWithFacebook();
+        });
+
+        // Role selection
+        function showRoleModal(availableRoles) {
+            const modal = document.getElementById('role-modal');
+            const roleOptions = modal.querySelectorAll('.role-option');
+            
+            // Show only available roles
+            roleOptions.forEach(option => {
+                const role = option.dataset.role;
+                option.style.display = availableRoles.includes(role) ? 'flex' : 'none';
+            });
+            
+            modal.classList.add('active');
+        }
+
+        // Role option clicks
+        document.querySelectorAll('.role-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const selectedRole = option.dataset.role;
+                window.authManager.setUserRole(selectedRole);
+                redirectToRoleDashboard(selectedRole);
+            });
+        });
+
+        function redirectToRoleDashboard(role) {
+            const redirectUrls = {
+                admin: '/pages/admin/dashboard.html',
+                staff: '/pages/booking-staff/dashboard.html',
+                customer: '/pages/user/dashboard.html'
+            };
+            
+            window.location.href = redirectUrls[role] || redirectUrls.customer;
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.authManager.isAuthenticated()) {
+                const user = window.authManager.getCurrentUser();
+                redirectToRoleDashboard(user.role);
+            }
+        });
+    </script>
+
+    <style>
+        .auth-page {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .auth-header h1 {
+            margin: 0 0 8px 0;
+            color: var(--text-dark);
+        }
+
+        .auth-header p {
+            margin: 0;
+            color: var(--text-light);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        .forgot-link {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        .btn-social {
+            width: 100%;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .form-divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .form-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .form-divider span {
+            background: white;
+            padding: 0 15px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .social-login {
+            margin: 20px 0;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .role-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .role-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .role-option:hover {
+            border-color: var(--primary-color);
+            background: var(--background-light);
+        }
+
+        .role-option i {
+            font-size: 24px;
+            color: var(--primary-color);
+            width: 30px;
+            text-align: center;
+        }
+
+        .role-option .role-title {
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .role-option .role-description {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        .toggle-password {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .toggle-password:hover {
+            color: var(--text-dark);
+        }
+    </style>
+</body>
+</html>
